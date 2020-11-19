@@ -1,8 +1,15 @@
 import React from 'react';
-import AppNavigation from './src/navigations/AppNavigation';
+import {UserProvider} from './src/UserProvider';
+import reducer, {initialState} from './src/reducer';
+
+import AppContainer from './AppContainer';
 
 const App = () => {
-  return <AppNavigation />;
+  return (
+    <UserProvider reducer={reducer} initialState={initialState}>
+      <AppContainer />
+    </UserProvider>
+  );
 };
 
 export default App;
