@@ -1,16 +1,23 @@
 import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   container: {
     flex: 1,
+    paddingHorizontal: 32,
+    backgroundColor: '#190A56',
+  },
+  content: {
+    flex: 1,
     alignItems: 'flex-start',
-    paddingHorizontal: 20,
+  },
+  title: {
+    color: '#fff',
+  },
+  username: {
+    fontSize: 36,
+    color: '#fff',
+    fontWeight: 'bold',
+    marginBottom: 32,
   },
 });
 

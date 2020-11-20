@@ -3,23 +3,24 @@ import {StyleSheet} from 'react-native';
 const styles = StyleSheet.create({
   btnClickContain: {
     flexDirection: 'row',
-    padding: 5,
-    marginTop: 5,
-    marginBottom: 5,
+    padding: 4,
+    marginBottom: 12,
+    borderRadius: 4,
   },
   btnContainer: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   btnIcon: {
-    height: 25,
-    width: 25,
+    fontSize: 24,
+    color: '#5E629C',
   },
   btnText: {
-    fontSize: 16,
-    marginLeft: 10,
+    fontSize: 18,
+    marginLeft: 16,
     marginTop: 2,
+    color: '#D5D7EF',
   },
 });
 
