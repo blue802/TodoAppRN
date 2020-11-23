@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {View, Image} from 'react-native';
 
 import styles from './styles';
@@ -12,3 +13,7 @@ const Avatar = ({avatarUrl}) => {
 };
 
 export default Avatar;
+
+Avatar.prototype = {
+  avatarUrl: PropTypes.string,
+};

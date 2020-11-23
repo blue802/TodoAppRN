@@ -24,4 +24,5 @@ export default MenuButton;
 MenuButton.prototype = {
   name: PropTypes.string,
   onPress: PropTypes.func,
+  iconName: PropTypes.string,
 };

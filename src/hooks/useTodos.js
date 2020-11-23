@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import PropTypes from 'prop-types';
 
 import firestore from '@react-native-firebase/firestore';
 
@@ -7,7 +8,7 @@ const useTodos = ({collection}) => {
 
   useEffect(() => {
     const unsub = firestore()
-      .collection('todos')
+      .collection(collection)
       .orderBy('createAt', 'desc')
       .onSnapshot((snap) => {
         let docs = [];
@@ -22,3 +23,7 @@ const useTodos = ({collection}) => {
 };
 
 export default useTodos;
+
+useTodos.prototype = {
+  collection: PropTypes.string.isRequired,
+};

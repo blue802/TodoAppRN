@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableHighlight} from 'react-native';
+import PropTypes from 'prop-types';
 
 import styles from './styles';
 
@@ -17,3 +18,7 @@ const GoogleSignIn = ({onGoogleButtonPress}) => {
 };
 
 export default GoogleSignIn;
+
+GoogleSignIn.prototype = {
+  onGoogleButtonPress: PropTypes.func.isRequired,
+};
