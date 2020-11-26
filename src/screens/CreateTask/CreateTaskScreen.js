@@ -7,11 +7,11 @@ import {Picker} from "@react-native-picker/picker";
 import styles from './styles'
 
 const CreateTaskScreen = ({navigation}) => {
-  const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
-  const [nameTask, setNameTask] = useState("");
-  const [category, setCategory] = useState("Default");
+  var [date, setDate] = useState(new Date());
+  var [mode, setMode] = useState('date');
+  var [show, setShow] = useState(false);
+  var [nameTask, setNameTask] = useState("");
+  var [category, setCategory] = useState("Mặc định");
 
   
 
@@ -36,16 +36,18 @@ const CreateTaskScreen = ({navigation}) => {
 
   const createTask = ()=>
   {
-    Alert.alert(nameTask)
+    console.log(nameTask);
+    console.log(date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear());
+    console.log(date.getHours()+":"+date.getMinutes());
+    // Alert.alert(nameTask)
     console.log(category)
-    Alert.alert(date.toLocaleDateString())
-    Alert.alert(date.toLocaleTimeString())
   }
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     navigation.setOptions({
       title:"Thêm mới",
-      headerRight: () => (
+      headerRight: () => 
+      (
         <TouchableOpacity onPress={createTask} >
           <Icon name="check" color={'#25a9e8'} size={32} style={{marginRight:10}}/>
         </TouchableOpacity>
@@ -60,8 +62,8 @@ const CreateTaskScreen = ({navigation}) => {
                   style = {styles.input} 
                   placeholder="Nhập nhiệm vụ ở đây" 
                   value={nameTask}
-                  onChangeText={async(text)=>{
-                    await setNameTask(text)}}/>
+                  onChangeText={(text)=>{
+                    setNameTask(text)}}/>
       </View>
       <View style = {styles.block}>
         <Text style = {styles.text}>Ngày hết hạn:</Text>
@@ -69,7 +71,7 @@ const CreateTaskScreen = ({navigation}) => {
           <TextInput type="text" style = {styles.input} 
                         placeholder="Chọn ngày hết hạn" 
                         name="date" 
-                        value={date.toLocaleDateString()}
+                        value={date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()}
                         onChangeText={showDatepicker}
                         readonly/>
           <Icon name="calendar-alt" color={'#25a9e8'} size={24} style={styles.calendar}/>
@@ -81,7 +83,7 @@ const CreateTaskScreen = ({navigation}) => {
           <TextInput type="text" style = {styles.input} 
                         placeholder="Chọn giờ" 
                         name="time" 
-                        value={date.toLocaleTimeString()}
+                        value={date.getHours()+":"+date.getMinutes()}
                         onChangeText={showTimepicker}
                         readonly/>
           <Icon name="clock" color={'#25a9e8'} size={24} style={styles.calendar}/>
@@ -97,6 +99,9 @@ const CreateTaskScreen = ({navigation}) => {
             <Picker.Item label="Mặc định" value="Mặc định" />
             <Picker.Item label="Công việc" value="Công việc" />
         </Picker>
+      </View>
+      <View style={styles.button}>
+        <Button title="Tạo mới" onPress = {createTask}  />
       </View>
       {show && (
         <DateTimePicker
