@@ -3,19 +3,17 @@ import {View, Text,TextInput,Button,TouchableOpacity,Alert} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Picker} from "@react-native-picker/picker"; 
-
+import {useUser} from '../../UserProvider';
 import styles from './styles'
 
 const EditTaskScreen = ({navigation,route}) => {
-  const { task } = route.params;
-  var date_arr =task.date.split('/').reverse();
-  var time_arr =task.time.split(':');
-  var [date, setDate] = useState(new Date(...date_arr,...time_arr));
+  const [{user:{email}}, dispath] = useUser();
+  const { task,editTask } = route.params;  
+  var [date, setDate] = useState(task.date_complete);
   var [mode, setMode] = useState('date');
   var [show, setShow] = useState(false);
   var [nameTask, setNameTask] = useState(task.name);
   var [category, setCategory] = useState(task.category);
-
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -36,26 +34,6 @@ const EditTaskScreen = ({navigation,route}) => {
     showMode('time');
   };
 
-  const createTask = ()=>
-  {
-    console.log(nameTask);
-    console.log(date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear());
-    console.log(date.getHours()+":"+date.getMinutes());
-    // Alert.alert(nameTask)
-    console.log(category)
-  }
-
-  React.useEffect(() => {
-    navigation.setOptions({
-      title:"Chi tiết",
-      headerRight: () => 
-      (
-        <TouchableOpacity onPress={createTask} >
-          <Icon name="check" color={'#25a9e8'} size={32} style={{marginRight:10}}/>
-        </TouchableOpacity>
-      )
-    });
-  }, [navigation]);
   return (
     <View style = {styles.container}>
       <View style = {styles.block}>
@@ -103,7 +81,7 @@ const EditTaskScreen = ({navigation,route}) => {
         </Picker>
       </View>
       <View style={styles.button}>
-        <Button title="Sửa" onPress = {createTask}  />
+        <Button title="Sửa" onPress = {()=>editTask(email,task.id,nameTask,category,date)}  />
       </View>
       {show && (
         <DateTimePicker

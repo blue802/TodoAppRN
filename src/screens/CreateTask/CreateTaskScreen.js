@@ -2,17 +2,23 @@ import React, {useState} from 'react';
 import {View, Text,TextInput,Button,TouchableOpacity,Alert} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Picker} from "@react-native-picker/picker"; 
+import {Picker} from "@react-native-picker/picker";
 
-import styles from './styles'
+import {addTask,getListTasks} from "../../components/services/ServicesStorage";
+import {useUser} from '../../UserProvider';
+import styles from './styles';
 
-const CreateTaskScreen = ({navigation}) => {
+
+const CreateTaskScreen = ({navigation,route}) => {
+  const [{user:{email}}, dispath] = useUser();
+
   var [date, setDate] = useState(new Date());
   var [mode, setMode] = useState('date');
   var [show, setShow] = useState(false);
   var [nameTask, setNameTask] = useState("");
   var [category, setCategory] = useState("Mặc định");
 
+  const {createTask} = route.params;
   
 
   const onChange = (event, selectedDate) => {
@@ -34,24 +40,15 @@ const CreateTaskScreen = ({navigation}) => {
     showMode('time');
   };
 
-  const createTask = ()=>
-  {
-    console.log(nameTask);
-    console.log(date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear());
-    console.log(date.getHours()+":"+date.getMinutes());
-    // Alert.alert(nameTask)
-    console.log(category)
-  }
-
   React.useEffect(() => {
     navigation.setOptions({
       title:"Thêm mới",
-      headerRight: () => 
-      (
-        <TouchableOpacity onPress={createTask} >
-          <Icon name="check" color={'#25a9e8'} size={32} style={{marginRight:10}}/>
-        </TouchableOpacity>
-      )
+      // headerRight: () => 
+      // (
+      //   <TouchableOpacity onPress={createTask} >
+      //     <Icon name="check" color={'#25a9e8'} size={32} style={{marginRight:10}}/>
+      //   </TouchableOpacity>
+      // )
     });
   }, [navigation]);
   return (
@@ -101,7 +98,7 @@ const CreateTaskScreen = ({navigation}) => {
         </Picker>
       </View>
       <View style={styles.button}>
-        <Button title="Tạo mới" onPress = {createTask}  />
+        <Button title="Tạo mới" onPress = {()=>createTask(email,nameTask,date,category)}  />
       </View>
       {show && (
         <DateTimePicker
