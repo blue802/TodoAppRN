@@ -1,9 +1,10 @@
 import {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-
 import firestore from '@react-native-firebase/firestore';
 
-const useTodos = ({collection}) => {
+import {useUser} from '../providers/UserProvider';
+const useTodos = (collection) => {
+  const [{user}] = useUser();
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
@@ -12,12 +13,16 @@ const useTodos = ({collection}) => {
       .orderBy('createAt', 'desc')
       .onSnapshot((snap) => {
         let docs = [];
-        snap.forEach((doc) => docs.push({id: doc.id, ...doc.data()}));
+        snap.forEach((doc) => {
+          if (doc.data().userId === user.uid) {
+            docs.push({id: doc.id, ...doc.data()});
+          }
+        });
         setTodos(docs);
       });
 
     return () => unsub();
-  }, [collection]);
+  }, [collection, user.uid]);
 
   return {todos};
 };

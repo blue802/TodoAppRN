@@ -1,17 +1,17 @@
 export const initialState = {
-  user: null,
+  todos: null,
 };
 
 export const actionTypes = {
-  SET_USER: 'SET_USER',
+  SET_TODOS: 'SET_TODOS',
 };
 
-const reducer = (state, action) => {
+const TodosReducer = (state, action) => {
   switch (action.type) {
-    case actionTypes.SET_USER:
+    case actionTypes.SET_TODOS:
       return {
         ...state,
-        user: action.payload,
+        todos: action.payload,
       };
 
     default:
@@ -19,4 +19,4 @@ const reducer = (state, action) => {
   }
 };
 
-export default reducer;
+export default TodosReducer;

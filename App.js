@@ -1,12 +1,12 @@
 import React from 'react';
-import {UserProvider} from './src/UserProvider';
-import reducer, {initialState} from './src/reducer';
+import {UserProvider} from './src/providers/UserProvider';
+import UserReducer, {initialState} from './src/reducers/UserReducer';
 
 import AppContainer from './AppContainer';
 
 const App = () => {
   return (
-    <UserProvider reducer={reducer} initialState={initialState}>
+    <UserProvider reducer={UserReducer} initialState={initialState}>
       <AppContainer />
     </UserProvider>
   );

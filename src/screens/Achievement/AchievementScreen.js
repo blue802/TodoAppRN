@@ -1,12 +1,12 @@
 import React from 'react';
 import {View, Text} from 'react-native';
 
-const EditTaskScreen = () => {
+const AchievementScreen = () => {
   return (
     <View>
-      <Text>Edit Screen</Text>
+      <Text>Achievement Screen</Text>
     </View>
   );
 };
 
-export default EditTaskScreen;
+export default AchievementScreen;

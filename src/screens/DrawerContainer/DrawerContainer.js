@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-community/google-signin';
 
-import {useUser} from '../../UserProvider';
-import {actionTypes} from '../../reducer';
+import {useUser} from '../../providers/UserProvider';
+import {actionTypes} from '../../reducers/UserReducer';
 import MenuButton from '../../components/MenuButton/MenuButton';
 import Avatar from '../../components/Avatar/Avatar';
 import styles from './styles';
@@ -29,16 +29,18 @@ const DrawerContainer = ({navigation}) => {
           }}
         />
         <MenuButton
-          name="Create Task"
+          name="Category"
+          iconName="balance-scale"
           onPress={() => {
-            navigation.navigate('CreateTask');
+            navigation.navigate('Category');
             navigation.closeDrawer();
           }}
         />
         <MenuButton
-          name="Edit Task"
+          name="Achievement"
+          iconName="trophy"
           onPress={() => {
-            navigation.navigate('EditTask');
+            navigation.navigate('Achievement');
             navigation.closeDrawer();
           }}
         />

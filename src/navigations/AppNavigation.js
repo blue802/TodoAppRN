@@ -7,7 +7,8 @@ import {TouchableOpacity} from 'react-native';
 
 import HomeScreen from '../screens/Home/HomeScreen';
 import CreateTaskScreen from '../screens/CreateTask/CreateTaskScreen';
-import EditTaskScreen from '../screens/EditTask/EditTaskScreen';
+import CategoryScreen from '../screens/Category/CategoryScreen';
+import AchievementScreen from '../screens/Achievement/AchievementScreen';
 import DrawerContainer from '../screens/DrawerContainer/DrawerContainer';
 import styles from './styles';
 
@@ -33,8 +34,21 @@ function MainNavigator() {
           headerStyle: styles.headerStyle,
         })}
       />
-      <Stack.Screen name="CreateTask" component={CreateTaskScreen} />
-      <Stack.Screen name="EditTask" component={EditTaskScreen} />
+      <Stack.Screen
+        name="CreateTask"
+        component={CreateTaskScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Category"
+        component={CategoryScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Achievement"
+        component={AchievementScreen}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 }
@@ -44,7 +58,6 @@ function DrawerStack() {
     <Drawer.Navigator
       drawerPosition="left"
       initialRouteName="Main"
-      // overlayColor="#190A56"
       drawerContent={(props) => (
         <DrawerContainer navigation={props.navigation} />
       )}>

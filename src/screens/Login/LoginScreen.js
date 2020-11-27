@@ -3,8 +3,8 @@ import {View, Text} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-community/google-signin';
 
-import {useUser} from '../../UserProvider';
-import {actionTypes} from '../../reducer';
+import {useUser} from '../../providers/UserProvider';
+import {actionTypes} from '../../reducers/UserReducer';
 import GoogleSignIn from '../../components/GoogleSignIn/GoogleSignIn';
 import styles from './styles';
 

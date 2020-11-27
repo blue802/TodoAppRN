@@ -1,33 +1,42 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  Platform,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, TextInput, TouchableOpacity, Platform} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Picker} from '@react-native-picker/picker';
+import firestore, {firebase} from '@react-native-firebase/firestore';
 
+import {useUser} from '../../providers/UserProvider';
 import styles from './styles';
 
-const CreateTaskScreen = ({navigation}) => {
-  const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
-  const [nameTask, setNameTask] = useState('');
-  const [category, setCategory] = useState('Default');
+const CreateTaskScreen = ({navigation, route}) => {
+  const [{user}] = useUser();
+  var [date, setDate] = useState(new Date());
+  var [mode, setMode] = useState('date');
+  var [showModal, setShowModal] = useState(false);
+  var [taskName, setTaskName] = useState('');
+  var [category, setCategory] = useState('personal');
+
+  useEffect(() => {
+    if (route.params) {
+      const {todo} = route.params;
+      setTaskName(todo.title);
+      setDate(todo.createAt.toDate());
+      setCategory(todo.category);
+    }
+  }, [route.params]);
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios');
+    setShowModal(Platform.OS === 'ios');
     setDate(currentDate);
   };
 
+  const toPrevious = () => {
+    navigation.navigate('Home');
+  };
+
   const showMode = (currentMode) => {
-    setShow(true);
+    setShowModal(true);
     setMode(currentMode);
   };
 
@@ -40,93 +49,100 @@ const CreateTaskScreen = ({navigation}) => {
   };
 
   const createTask = () => {
-    Alert.alert(nameTask);
-    console.log(category);
-    Alert.alert(date.toLocaleDateString());
-    Alert.alert(date.toLocaleTimeString());
+    const task = {
+      title: taskName,
+      createAt: firebase.firestore.Timestamp.fromDate(date),
+      category,
+      isCompleted: false,
+      userId: user.uid,
+    };
+    firestore()
+      .collection('todos')
+      .add(task)
+      .then(() => {
+        console.log(`The task has been created!`);
+        navigation.navigate('Home');
+      });
   };
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      title: 'Thêm mới',
-      headerRight: () => (
-        <TouchableOpacity onPress={createTask}>
-          <Icon
-            name="check"
-            color="#25a9e8"
-            size={32}
-            style={{marginRight: 10}}
-          />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
+  const updateTask = () => {
+    const task = {
+      title: taskName,
+      createAt: firebase.firestore.Timestamp.fromDate(date),
+      category,
+    };
+    firestore()
+      .collection('todos')
+      .doc(route.params.todo.id)
+      .update(task)
+      .then(() => {
+        console.log('The task has been edited!');
+        navigation.navigate('Home');
+      });
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.block}>
-        <Text style={styles.text}>Nhiệm vụ:</Text>
-        <TextInput
-          type="text"
-          style={styles.input}
-          placeholder="Nhập nhiệm vụ ở đây"
-          value={nameTask}
-          onChangeText={async (text) => {
-            await setNameTask(text);
-          }}
-        />
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.btnClose} onPress={toPrevious}>
+          <Icon name="times" style={styles.icon} />
+        </TouchableOpacity>
       </View>
-      <View style={styles.block}>
-        <Text style={styles.text}>Ngày hết hạn:</Text>
-        <TouchableOpacity onPress={showDatepicker}>
+      <View style={styles.body}>
+        <View style={styles.inputWrap}>
           <TextInput
             type="text"
             style={styles.input}
-            placeholder="Chọn ngày hết hạn"
-            name="date"
-            value={date.toLocaleDateString()}
-            onChangeText={showDatepicker}
-            readonly
+            placeholder={route.params ? 'Edit task' : 'Create a new task..'}
+            value={taskName}
+            onChangeText={(text) => {
+              setTaskName(text);
+            }}
           />
-          <Icon
-            name="calendar-alt"
-            color={'#25a9e8'}
-            size={24}
-            style={styles.calendar}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.block}>
-        <Text style={styles.text}>Vào lúc:</Text>
-        <TouchableOpacity onPress={showTimepicker}>
-          <TextInput
-            type="text"
-            style={styles.input}
-            placeholder="Chọn giờ"
-            name="time"
-            value={date.toLocaleTimeString()}
-            onChangeText={showTimepicker}
-            readonly
-          />
-          <Icon
-            name="clock"
-            color={'#25a9e8'}
-            size={24}
-            style={styles.calendar}
-          />
-        </TouchableOpacity>
-      </View>
+        </View>
+        <View style={styles.btnWrap}>
+          <TouchableOpacity onPress={showDatepicker} style={styles.btn}>
+            <Icon name="calendar-alt" style={styles.icon} />
+            <Text style={styles.text}>
+              {date.getDate() +
+                '-' +
+                (date.getMonth() + 1) +
+                '-' +
+                date.getFullYear()}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={showTimepicker} style={styles.btn}>
+            <Icon name="clock" style={styles.icon} />
+            <Text style={styles.text}>
+              {date.getHours() + ':' + date.getMinutes()}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.block}>
-        <Text style={styles.text}>Thêm vào danh sách:</Text>
-        <Picker
-          selectedValue={category}
-          style={styles.picker}
-          onValueChange={(itemValue, itemIndex) => setCategory(itemValue)}>
-          <Picker.Item label="Mặc định" value="Mặc định" />
-          <Picker.Item label="Công việc" value="Công việc" />
-        </Picker>
+        <View style={styles.pickerWrap}>
+          <Picker
+            selectedValue={category}
+            style={styles.picker}
+            onValueChange={(itemValue) => setCategory(itemValue)}>
+            <Picker.Item label="Default" value="default" />
+            <Picker.Item label="Business" value="business" />
+            <Picker.Item label="Personal" value="personal" />
+            <Picker.Item label="Family" value="family" />
+          </Picker>
+        </View>
       </View>
-      {show && (
+      <View style={styles.footer}>
+        {route.params ? (
+          <TouchableOpacity style={styles.btnCreate} onPress={updateTask}>
+            <Text style={{fontSize: 18, color: '#fff'}}>Save</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.btnCreate} onPress={createTask}>
+            <Text style={{fontSize: 18, color: '#fff'}}>New task</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {showModal && (
         <DateTimePicker
           testID="dateTimePicker"
           value={date}
