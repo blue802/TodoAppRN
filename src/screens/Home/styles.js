@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: 'gray',
+    color: '#bcb8b1',
     marginBottom: 16,
   },
   message: {

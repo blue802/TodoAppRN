@@ -8,6 +8,7 @@ import {TouchableOpacity} from 'react-native';
 import HomeScreen from '../screens/Home/HomeScreen';
 import CreateTaskScreen from '../screens/CreateTask/CreateTaskScreen';
 import CategoryScreen from '../screens/Category/CategoryScreen';
+import CategoryDetailsScreen from '../screens/CategoryDetails/CategoryDetailsScreen';
 import AchievementScreen from '../screens/Achievement/AchievementScreen';
 import DrawerContainer from '../screens/DrawerContainer/DrawerContainer';
 import styles from './styles';
@@ -42,11 +43,38 @@ function MainNavigator() {
       <Stack.Screen
         name="Category"
         component={CategoryScreen}
-        options={{headerShown: false}}
+        options={({navigation}) => ({
+          title: '',
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{padding: 16}}
+              activeOpacity={0.5}
+              onPress={() => navigation.openDrawer()}>
+              <Icon name="grip-lines" color={'gray'} size={24} />
+            </TouchableOpacity>
+          ),
+          headerStyle: styles.headerStyle,
+        })}
       />
       <Stack.Screen
         name="Achievement"
         component={AchievementScreen}
+        options={({navigation}) => ({
+          title: '',
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{padding: 16}}
+              activeOpacity={0.5}
+              onPress={() => navigation.openDrawer()}>
+              <Icon name="grip-lines" color={'gray'} size={24} />
+            </TouchableOpacity>
+          ),
+          headerStyle: styles.headerStyle,
+        })}
+      />
+      <Stack.Screen
+        name="CategoryDetails"
+        component={CategoryDetailsScreen}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

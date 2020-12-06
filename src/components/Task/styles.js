@@ -3,6 +3,7 @@ import {StyleSheet} from 'react-native';
 const styles = StyleSheet.create({
   container: {
     height: 64,
+
     // flexDirection: 'row',
   },
   rowBack: {
@@ -36,6 +37,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     backgroundColor: '#fff',
     borderRadius: 8,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   iconTrash: {
     fontSize: 20,

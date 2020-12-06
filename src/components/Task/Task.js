@@ -2,6 +2,7 @@ import React, {useRef, useState} from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {SwipeRow} from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import firestore, {firebase} from '@react-native-firebase/firestore';
 
 import styles from './styles';
 
@@ -12,6 +13,14 @@ const Task = ({navigation, todo, deleteById}) => {
 
   const handleCompleteTask = () => {
     setIsCompleted(!isCompleted);
+    firestore()
+      .collection('todos')
+      .doc(todo.id)
+      .update({isCompleted: !isCompleted})
+      .then(() => {
+        console.log('The task has been completed!');
+        navigation.navigate('Home');
+      });
   };
 
   const onSwipeValueChange = ({value}) => {

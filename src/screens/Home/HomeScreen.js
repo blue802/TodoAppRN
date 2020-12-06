@@ -34,6 +34,9 @@ const HomeScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.hiStyle}>What's up, {user.displayName}!</Text>
+      <View>
+        <Text>Progress</Text>
+      </View>
       <Text style={styles.sectionTitle}>TODAY'S TASKS</Text>
       {todos.length > 0 ? (
         <FlatList
