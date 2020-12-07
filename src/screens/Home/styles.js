@@ -16,6 +16,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#3F2FFF',
+    shadowColor: '#3F2FFF',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   plusIcon: {
     fontSize: 32,

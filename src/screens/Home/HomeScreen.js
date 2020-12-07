@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, FlatList} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import * as Progress from 'react-native-progress';
 
 import {useUser} from '../../providers/UserProvider';
 import useTodos from '../../hooks/useTodos';
@@ -15,7 +16,7 @@ import styles from './styles';
 
 const HomeScreen = ({navigation}) => {
   const [{user}] = useUser();
-  const {todos} = useTodos('todos');
+  const {todos, total, done} = useTodos('todos');
 
   const deleteById = (id) => {
     firestore()
@@ -34,8 +35,16 @@ const HomeScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.hiStyle}>What's up, {user.displayName}!</Text>
-      <View>
-        <Text>Progress</Text>
+      <View style={{alignItems: 'center', marginVertical: 16}}>
+        <Progress.Circle
+          progress={total === 0 ? 0 : done / total}
+          size={156}
+          showsText={true}
+          color="#3F2FFF"
+          borderWidth={0}
+          thickness={8}
+          strokeCap="round"
+        />
       </View>
       <Text style={styles.sectionTitle}>TODAY'S TASKS</Text>
       {todos.length > 0 ? (

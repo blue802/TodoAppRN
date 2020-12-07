@@ -2,7 +2,7 @@ import React, {useRef, useState} from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {SwipeRow} from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import firestore, {firebase} from '@react-native-firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 
 import styles from './styles';
 
@@ -12,14 +12,14 @@ const Task = ({navigation, todo, deleteById}) => {
   const deleteTimeoutRef = useRef(null);
 
   const handleCompleteTask = () => {
-    setIsCompleted(!isCompleted);
+    setIsCompleted(true);
     firestore()
       .collection('todos')
       .doc(todo.id)
-      .update({isCompleted: !isCompleted})
+      .update({isCompleted: true})
       .then(() => {
         console.log('The task has been completed!');
-        navigation.navigate('Home');
+        // navigation.navigate('Home');
       });
   };
 
@@ -83,3 +83,8 @@ const Task = ({navigation, todo, deleteById}) => {
 };
 
 export default Task;
+//Achievement = {
+//   userId: string,
+//   level: number,
+//   badges: array[],
+// }
