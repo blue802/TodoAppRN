@@ -5,6 +5,7 @@ import styles from './style';
 import Category from '../../components/Category/Category';
 
 const CategoryScreen = ({navigation}) => {
+  console.log("category screen")
   return (
     <View style={styles.container}>
       <Category category="business" color="#00f5d4" navigation={navigation} />

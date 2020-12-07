@@ -2,31 +2,24 @@ import React, {useRef, useState} from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {SwipeRow} from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import firestore, {firebase} from '@react-native-firebase/firestore';
+import {useUser} from "../../providers/UserProvider"
 
 import styles from './styles';
 
-const Task = ({navigation, todo, deleteById}) => {
+const Task = ({navigation, todo, deleteById,edit,toggle}) => {
+  const [{user}] = useUser();
   const [isCompleted, setIsCompleted] = useState(todo.isCompleted);
   const closeRowRef = useRef(null);
   const deleteTimeoutRef = useRef(null);
 
   const handleCompleteTask = () => {
     setIsCompleted(!isCompleted);
-    firestore()
-      .collection('todos')
-      .doc(todo.id)
-      .update({isCompleted: !isCompleted})
-      .then(() => {
-        console.log('The task has been completed!');
-        navigation.navigate('Home');
-      });
   };
 
   const onSwipeValueChange = ({value}) => {
     if (value === -Dimensions.get('window').width + 32) {
       deleteTimeoutRef.current = setTimeout(() => {
-        deleteById(todo.id);
+        deleteById(user.uid,todo.taskId);
       }, 1500);
     }
   };
@@ -52,27 +45,27 @@ const Task = ({navigation, todo, deleteById}) => {
       </View>
       <TouchableOpacity
         activeOpacity={1}
-        onPress={() => navigation.navigate('CreateTask', {todo})}>
+        onPress={() => navigation.navigate('CreateTask', {todo,edit})}>
         <View style={styles.rowFront}>
-          {isCompleted ? (
+          {todo.isCompleted ? (
             <Icon
               name="check-circle"
-              onPress={handleCompleteTask}
-              style={{...styles.icon, opacity: isCompleted ? 0.5 : 1}}
+              onPress={()=>toggle(user.uid,todo.taskId)}
+              style={{...styles.icon, opacity: todo.isCompleted ? 0.5 : 1}}
               solid={true}
             />
           ) : (
             <Icon
               name="circle"
-              onPress={handleCompleteTask}
-              style={{...styles.icon, opacity: isCompleted ? 0.5 : 1}}
+              onPress={()=>toggle(user.uid,todo.taskId)}
+              style={{...styles.icon, opacity: todo.isCompleted ? 0.5 : 1}}
             />
           )}
           <Text
             style={{
               ...styles.title,
-              textDecorationLine: isCompleted ? 'line-through' : 'none',
-              opacity: isCompleted ? 0.5 : 1,
+              textDecorationLine: todo.isCompleted ? 'line-through' : 'none',
+              opacity: todo.isCompleted ? 0.5 : 1,
             }}>
             {todo.title}
           </Text>

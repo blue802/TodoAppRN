@@ -1,26 +1,47 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
 import Task from '../../components/Task/Task';
 import styles from './styles';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import {editTask,toggleTask,removeTask} from '../../components/services/ServicesStorage'
+import {useUser} from '../../providers/UserProvider';
 
 const CategoryDetailsScreen = ({route, navigation}) => {
   const {todos, category} = route.params;
+  const [{user}] = useUser();
+  const [tasks,setTask] = useState(todos);
 
-  const deleteById = (id) => {
-    firestore()
-      .collection('todos')
-      .doc(id)
-      .delete()
-      .then(() => {
-        console.log('The task was deleted.');
-      });
+  const deleteById = (userId,taskId) => {
+    removeTask(userId,taskId)
+    .then((tasks) =>{
+      tasks = tasks.filter(t => t.category === category);
+      setTask(tasks)
+    });
   };
 
+  const edit = (userId,newTask)=>{
+      editTask(userId,newTask)
+      .then((tasks) => 
+            {
+              tasks = tasks.filter(t => t.category === category);
+              setTask(tasks);
+              navigation.navigate("CategoryDetails");
+            });
+  }
+
+  const toggle = (userId,taskId) => {
+      toggleTask(userId,taskId)
+      .then((tasks) => 
+            {
+              tasks = tasks.filter(t => t.category === category);
+              setTask(tasks);
+            });
+  }
+
   const renderItem = ({item}) => (
-    <Task todo={item} navigation={navigation} deleteById={deleteById} />
+    <Task todo={item} navigation={navigation} deleteById={deleteById} edit = {edit} toggle={toggle}/>
   );
 
   const toPrevious = () => {
@@ -36,9 +57,9 @@ const CategoryDetailsScreen = ({route, navigation}) => {
       </View>
       <View style={styles.body}>
         <Text style={styles.sectionTitle}>{category.toUpperCase()}</Text>
-        {todos.length > 0 ? (
+        {tasks.length > 0 ? (
           <FlatList
-            data={todos}
+            data={tasks}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
           />

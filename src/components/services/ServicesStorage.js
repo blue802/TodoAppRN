@@ -1,81 +1,79 @@
-// import realm from '../realm';
-// import shortId from 'shortid';
+import realm from '../realm';
+import shortId from 'shortid';
 
-// export const getListTasks = (email) => {
-//   let tasks = [];
-//   const user = realm.objects('User').find((user) => user.email === email);
-//   if (!user) {
-//     //user đăng nhập lần đầu
-//     return new Promise((resolve, reject) => {
-//       realm.write(() => {
-//         realm.create('User', {email, tasks: []});
-//         resolve(tasks);
-//       });
-//     });
-//   } else {
-//     tasks = user.tasks;
-//     return Promise.resolve(tasks);
-//   }
-// };
+export const getListTasks = (userId) => 
+{
+    const tasks = realm.objects('Task').filter((task) => task.userId === userId);
+    return Promise.resolve(tasks);
+};
 
-// export const addTask = (email, name, date_complete, category) => {
-//   if (!name) {
-//     return Promise.reject('Task name is empty');
-//   }
-//   const id = shortId.generate();
-//   const data = {
-//     id,
-//     name,
-//     date_complete,
-//     category,
-//     status: false,
-//     date_create: new Date(),
-//   };
+export const addTask = (title, createAt,category,userId) => {
+    let taskId = shortId.generate();
+    const task = 
+    {
+        taskId,
+        title,
+        isCompleted: false,
+        category,
+        createAt,
+        userId
+    };
+    let tasks = realm.objects('Task').filter((task) => task.userId === userId);
+    tasks.push(task);
 
-//   const {tasks} = realm.objects('User').find((user) => user.email === email);
+    return new Promise((resolve, reject) => {
+    realm.write(() => {
+      realm.create("Task", task)
+      resolve(tasks);
+    });
+  });
+};
 
-//   return new Promise((resolve, reject) => {
-//     realm.write(() => {
-//       // realm.create('Task', data)
-//       tasks.push(data);
-//       resolve(tasks);
-//     });
-//   });
-// };
+export const removeTask = (userId, taskId) => {
+  let tasks = realm.objects('Task').filter((task) => task.userId === userId);
+  const task = tasks.find((task) => task.taskId === taskId);
+  tasks = tasks.filter((task) => task.taskId !== taskId);
+  return new Promise((resolve) => {
+    realm.write(() => {
+      realm.delete(task);
+      resolve(tasks);
+    });
+  });
+};
 
-// export const removeTask = (email, task) => {
-//   const {tasks} = realm.objects('User').find((user) => user.email === email);
-//   return new Promise((resolve) => {
-//     realm.write(() => {
-//       realm.delete(task);
+export const toggleTask = (userId,taskId) => {
+    const tasks = realm.objects('Task').filter((task) => task.userId === userId);
+    const task = tasks.find((task) => task.taskId === taskId);
+    return new Promise((resolve) => 
+    {
+        realm.write(() => {
+        task.isCompleted = !task.isCompleted;
+        realm.create("Task",task,"modified")
+        resolve(tasks);
+    });
+  });
+};
 
-//       resolve(tasks);
-//     });
-//   });
-// };
+export const editTask = (userId,newTask) => {
+    const tasks = realm.objects('Task').filter((task) => task.userId === userId);
+    let task = tasks.find((task) => task.taskId === newTask.taskId);
+    console.log(newTask);
+    return new Promise((resolve) => {
+        realm.write(() => 
+        {
+            task.title = newTask.title;
+            task.category = newTask.category;
+            task.createAt = newTask.date;
+            realm.create("Task",task,"modified")
+            resolve(tasks);
+        }
+    );
+  });
+};
 
-// export const toggleTask = (task) => {
-//   const tasks = realm.objects('Task');
-
-//   return new Promise((resolve) => {
-//     realm.write(() => {
-//       task.status = !task.status;
-
-//       resolve(tasks);
-//     });
-//   });
-// };
-
-// export const editTask = (email, id, newName, newCategory, newDate) => {
-//   const {tasks} = realm.objects('User').find((user) => user.email === email);
-//   const task = tasks.find((task) => task.id === id);
-//   console.log(task);
-//   return new Promise((resolve) => {
-//     realm.write(() => {
-//       task.name = newName;
-//       task.category = newCategory;
-//       task.date = newDate;
-//       resolve(tasks);
-//     });
-//   });
-// };
+export const getTaskByCategory = (userId,category) => 
+{
+    const tasks = realm.objects('Task')
+    .filter((task) => (task.userId === userId)&&(task.category === category));
+    return Promise.resolve(tasks);
+};

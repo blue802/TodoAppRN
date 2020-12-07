@@ -14,13 +14,12 @@ const CreateTaskScreen = ({navigation, route}) => {
   var [mode, setMode] = useState('date');
   var [showModal, setShowModal] = useState(false);
   var [taskName, setTaskName] = useState('');
-  var [category, setCategory] = useState('personal');
-
+  var [category, setCategory] = useState("personal");
+  const {add,edit,todo} = route.params;
   useEffect(() => {
-    if (route.params) {
-      const {todo} = route.params;
+    if (route.params.todo) {
       setTaskName(todo.title);
-      setDate(todo.createAt.toDate());
+      setDate(todo.createAt);
       setCategory(todo.category);
     }
   }, [route.params]);
@@ -47,40 +46,6 @@ const CreateTaskScreen = ({navigation, route}) => {
   const showTimepicker = () => {
     showMode('time');
   };
-
-  const createTask = () => {
-    const task = {
-      title: taskName,
-      createAt: firebase.firestore.Timestamp.fromDate(date),
-      category,
-      isCompleted: false,
-      userId: user.uid,
-    };
-    firestore()
-      .collection('todos')
-      .add(task)
-      .then(() => {
-        console.log(`The task has been created!`);
-        navigation.navigate('Home');
-      });
-  };
-
-  const updateTask = () => {
-    const task = {
-      title: taskName,
-      createAt: firebase.firestore.Timestamp.fromDate(date),
-      category,
-    };
-    firestore()
-      .collection('todos')
-      .doc(route.params.todo.id)
-      .update(task)
-      .then(() => {
-        console.log('The task has been edited!');
-        navigation.navigate('Home');
-      });
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -93,7 +58,7 @@ const CreateTaskScreen = ({navigation, route}) => {
           <TextInput
             type="text"
             style={styles.input}
-            placeholder={route.params ? 'Edit task' : 'Create a new task..'}
+            placeholder={route.params.todo ? 'Edit task' : 'Create a new task..'}
             value={taskName}
             onChangeText={(text) => {
               setTaskName(text);
@@ -132,12 +97,17 @@ const CreateTaskScreen = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.footer}>
-        {route.params ? (
-          <TouchableOpacity style={styles.btnCreate} onPress={updateTask}>
+        {route.params.todo ? (
+          <TouchableOpacity style={styles.btnCreate} 
+                            onPress={()=>
+                            {
+                              const newTask={title:taskName,date,category,taskId:todo.taskId}
+                              edit(user.uid,newTask);
+                            }}>
             <Text style={{fontSize: 18, color: '#fff'}}>Save</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.btnCreate} onPress={createTask}>
+          <TouchableOpacity style={styles.btnCreate} onPress={()=>add(taskName,date,category,user.uid)}>
             <Text style={{fontSize: 18, color: '#fff'}}>New task</Text>
           </TouchableOpacity>
         )}

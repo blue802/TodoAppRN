@@ -6,6 +6,7 @@ import {GoogleSignin} from '@react-native-community/google-signin';
 import {useUser} from '../../providers/UserProvider';
 import {actionTypes} from '../../reducers/UserReducer';
 import GoogleSignIn from '../../components/GoogleSignIn/GoogleSignIn';
+import {addUser} from "../../components/services/UserStorage"
 import styles from './styles';
 
 GoogleSignin.configure({
@@ -27,6 +28,9 @@ const LoginScreen = () => {
     auth()
       .signInWithCredential(googleCredential)
       .then((res) => {
+        const {displayName,email,photoURL,uid} = res.user;
+        const user = {displayName,email,photoURL,uid}
+        addUser(user);
         dispatch({type: actionTypes.SET_USER, payload: res.user});
       });
   }
