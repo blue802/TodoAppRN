@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, TouchableHighlight} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 
 import useCategory from '../../hooks/useCategory';
 import styles from './styles';
@@ -13,7 +13,10 @@ const Category = ({category, color, navigation}) => {
   };
 
   return (
-    <TouchableHighlight style={styles.box} onPress={goToDetailsScreen}>
+    <TouchableOpacity
+      style={styles.box}
+      onPress={goToDetailsScreen}
+      activeOpacity={0.85}>
       <View>
         <Text style={styles.desc}>
           {done} / {total} tasks
@@ -33,7 +36,7 @@ const Category = ({category, color, navigation}) => {
             }}></View>
         </View>
       </View>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 };
 

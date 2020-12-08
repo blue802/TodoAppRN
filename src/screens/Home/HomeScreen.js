@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import NetInfo from "@react-native-community/netinfo"
 import {View, Text, TouchableOpacity, FlatList,Platform} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import { LogBox } from 'react-native';
-LogBox.ignoreAllLogs();
+
+import * as Progress from 'react-native-progress';
 
 import {useUser} from '../../providers/UserProvider';
 import useTodos from '../../hooks/useTodos';
@@ -21,7 +21,8 @@ import styles from './styles';
 const HomeScreen = ({navigation}) => {
   console.log("home screen")
   const [{user}] = useUser();
-  const [tasks,setTask] = useState([]);
+
+  const {todos, total, done} = useTodos('todos');
 
   useEffect(()=>
   {
@@ -76,6 +77,17 @@ const HomeScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.hiStyle}>What's up, {user.displayName}!</Text>
+      <View style={{alignItems: 'center', marginVertical: 16}}>
+        <Progress.Circle
+          progress={total === 0 ? 0 : done / total}
+          size={156}
+          showsText={true}
+          color="#3F2FFF"
+          borderWidth={0}
+          thickness={8}
+          strokeCap="round"
+        />
+      </View>
       <Text style={styles.sectionTitle}>TODAY'S TASKS</Text>
       {tasks.length > 0 ? (
         <FlatList
