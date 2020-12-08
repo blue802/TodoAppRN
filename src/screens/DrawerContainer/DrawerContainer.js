@@ -9,6 +9,7 @@ import {actionTypes} from '../../reducers/UserReducer';
 import MenuButton from '../../components/MenuButton/MenuButton';
 import Avatar from '../../components/Avatar/Avatar';
 import styles from './styles';
+import {removeUser} from "../../components/services/UserStorage"
 
 const DrawerContainer = ({navigation}) => {
   const [{user}, dispatch] = useUser();
@@ -49,12 +50,13 @@ const DrawerContainer = ({navigation}) => {
         name="Sign out"
         iconName="sign-out-alt"
         onPress={async () => {
+          removeUser();
+          dispatch({type: actionTypes.SET_USER, payload: null});
           try {
             await GoogleSignin.signOut();
             auth()
               .signOut()
               .then(() => {
-                dispatch({type: actionTypes.SET_USER, payload: null});
                 console.log('User signed out!');
               });
           } catch (error) {
