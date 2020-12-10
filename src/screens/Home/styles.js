@@ -41,6 +41,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'gray',
   },
+  progressWrap: {
+    alignItems: 'center',
+    marginVertical: 16,
+  },
 });
 
 export default styles;

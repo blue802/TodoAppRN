@@ -1,26 +1,41 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, Platform} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+  LogBox,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Picker} from '@react-native-picker/picker';
-import firestore, {firebase} from '@react-native-firebase/firestore';
+import shortid from 'shortid';
 
-import {useUser} from '../../providers/UserProvider';
+import syncData from '../../container/syncData';
+import {useUserProvider} from '../../providers/UserProvider';
+import {useTodosProvider} from '../../providers/TodosProvider';
+import {actionTypes} from '../../reducers/TodosReducer';
+import {
+  addNewTaskToLocalStorage,
+  updateTaskFromLocalStorage,
+} from '../../services/ServicesStorage';
 import styles from './styles';
 
 const CreateTaskScreen = ({navigation, route}) => {
-  const [{user}] = useUser();
+  const [{user}] = useUserProvider();
+  const [{todos}, dispatch] = useTodosProvider();
   var [date, setDate] = useState(new Date());
   var [mode, setMode] = useState('date');
   var [showModal, setShowModal] = useState(false);
   var [taskName, setTaskName] = useState('');
-  var [category, setCategory] = useState('personal');
+  var [category, setCategory] = useState(null);
 
   useEffect(() => {
     if (route.params) {
       const {todo} = route.params;
       setTaskName(todo.title);
-      setDate(todo.createAt.toDate());
+      setDate(todo.createAt);
       setCategory(todo.category);
     }
   }, [route.params]);
@@ -50,35 +65,38 @@ const CreateTaskScreen = ({navigation, route}) => {
 
   const createTask = () => {
     const task = {
+      id: shortid.generate(),
       title: taskName,
-      createAt: firebase.firestore.Timestamp.fromDate(date),
+      createAt: date,
       category,
       isCompleted: false,
       userId: user.uid,
     };
-    firestore()
-      .collection('todos')
-      .add(task)
-      .then(() => {
-        console.log(`The task has been created!`);
-        navigation.navigate('Home');
-      });
+
+    dispatch({type: actionTypes.ADD_TASK, payload: task});
+    addNewTaskToLocalStorage(task).then((msg) => {
+      console.log(msg);
+      syncData(user.uid);
+      navigation.navigate('Home');
+    });
   };
 
   const updateTask = () => {
+    const {todo} = route.params;
     const task = {
+      id: todo.id,
       title: taskName,
-      createAt: firebase.firestore.Timestamp.fromDate(date),
       category,
+      isCompleted: todo.isCompleted,
+      createAt: date,
+      userId: todo.userId,
     };
-    firestore()
-      .collection('todos')
-      .doc(route.params.todo.id)
-      .update(task)
-      .then(() => {
-        console.log('The task has been edited!');
-        navigation.navigate('Home');
-      });
+    dispatch({type: actionTypes.UPDATE_TASK, payload: task});
+    updateTaskFromLocalStorage(task).then((msg) => {
+      console.log(msg);
+      navigation.navigate('Home');
+    });
+    syncData(user.uid);
   };
 
   return (
@@ -124,7 +142,6 @@ const CreateTaskScreen = ({navigation, route}) => {
             selectedValue={category}
             style={styles.picker}
             onValueChange={(itemValue) => setCategory(itemValue)}>
-            <Picker.Item label="Default" value="default" />
             <Picker.Item label="Business" value="business" />
             <Picker.Item label="Personal" value="personal" />
             <Picker.Item label="Family" value="family" />
@@ -155,5 +172,9 @@ const CreateTaskScreen = ({navigation, route}) => {
     </View>
   );
 };
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 export default CreateTaskScreen;

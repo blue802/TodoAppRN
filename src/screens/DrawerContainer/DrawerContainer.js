@@ -4,14 +4,15 @@ import PropTypes from 'prop-types';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-community/google-signin';
 
-import {useUser} from '../../providers/UserProvider';
+import {removeUserFromLocalStorage} from '../../services/UserStorage';
+import {useUserProvider} from '../../providers/UserProvider';
 import {actionTypes} from '../../reducers/UserReducer';
 import MenuButton from '../../components/MenuButton/MenuButton';
 import Avatar from '../../components/Avatar/Avatar';
 import styles from './styles';
 
 const DrawerContainer = ({navigation}) => {
-  const [{user}, dispatch] = useUser();
+  const [{user}, dispatch] = useUserProvider();
 
   return (
     <View style={styles.container}>
@@ -57,6 +58,7 @@ const DrawerContainer = ({navigation}) => {
                 dispatch({type: actionTypes.SET_USER, payload: null});
                 console.log('User signed out!');
               });
+            await removeUserFromLocalStorage();
           } catch (error) {
             console.log(error);
           }

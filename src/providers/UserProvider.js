@@ -10,4 +10,4 @@ export const UserProvider = ({reducer, initialState, children}) => {
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export const useUserProvider = () => useContext(UserContext);

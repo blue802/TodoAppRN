@@ -3,11 +3,11 @@ import React from 'react';
 import AppNavigation from './src/navigations/AppNavigation';
 import LoginScreen from './src/screens/Login/LoginScreen';
 import {TodosProvider} from './src/providers/TodosProvider';
-import {useUser} from './src/providers/UserProvider';
+import {useUserProvider} from './src/providers/UserProvider';
 import TodosReducer, {initialState} from './src/reducers/TodosReducer';
 
 const AppContainer = () => {
-  const [{user}, dispatch] = useUser();
+  const [{user}, dispatch] = useUserProvider();
 
   return !user ? (
     <LoginScreen />

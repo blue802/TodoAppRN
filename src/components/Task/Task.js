@@ -1,32 +1,48 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {SwipeRow} from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import firestore from '@react-native-firebase/firestore';
 
+import syncData from '../../container/syncData';
+import {
+  updateTaskFromLocalStorage,
+  getTodosFromLocalStorage,
+} from '../../services/ServicesStorage';
+import {useTodosProvider} from '../../providers/TodosProvider';
+import {useUserProvider} from '../../providers/UserProvider';
+import {actionTypes} from '../../reducers/TodosReducer';
 import styles from './styles';
 
-const Task = ({navigation, todo, deleteById}) => {
-  const [isCompleted, setIsCompleted] = useState(todo.isCompleted);
+const Task = ({navigation, todo, deleteTask}) => {
+  const [isCompleted, setIsCompleted] = useState(false);
   const closeRowRef = useRef(null);
   const deleteTimeoutRef = useRef(null);
+  const [state, dispatch] = useTodosProvider();
+  const [{user}] = useUserProvider();
+
+  useEffect(() => {
+    setIsCompleted(todo.isCompleted);
+  }, [todo.isCompleted]);
 
   const handleCompleteTask = () => {
     setIsCompleted(true);
-    firestore()
-      .collection('todos')
-      .doc(todo.id)
-      .update({isCompleted: true})
-      .then(() => {
-        console.log('The task has been completed!');
-        // navigation.navigate('Home');
-      });
+    const task = {
+      id: todo.id,
+      title: todo.title,
+      category: todo.category,
+      isCompleted: true,
+      createAt: todo.createAt,
+      userId: todo.userId,
+    };
+    dispatch({type: actionTypes.UPDATE_TASK, payload: task});
+    updateTaskFromLocalStorage(task);
+    syncData(user.uid);
   };
 
   const onSwipeValueChange = ({value}) => {
     if (value === -Dimensions.get('window').width + 32) {
       deleteTimeoutRef.current = setTimeout(() => {
-        deleteById(todo.id);
+        deleteTask(todo);
       }, 1500);
     }
   };
@@ -52,13 +68,15 @@ const Task = ({navigation, todo, deleteById}) => {
       </View>
       <TouchableOpacity
         activeOpacity={1}
-        onPress={() => navigation.navigate('CreateTask', {todo})}>
+        onPress={() =>
+          !todo.isCompleted && navigation.navigate('CreateTask', {todo})
+        }>
         <View style={styles.rowFront}>
           {isCompleted ? (
             <Icon
               name="check-circle"
-              onPress={handleCompleteTask}
               style={{...styles.icon, opacity: isCompleted ? 0.5 : 1}}
+              onPress={handleCompleteTask}
               solid={true}
             />
           ) : (
@@ -83,8 +101,3 @@ const Task = ({navigation, todo, deleteById}) => {
 };
 
 export default Task;
-//Achievement = {
-//   userId: string,
-//   level: number,
-//   badges: array[],
-// }

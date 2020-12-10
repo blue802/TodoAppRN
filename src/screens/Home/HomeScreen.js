@@ -1,43 +1,63 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, FlatList} from 'react-native';
-import firestore from '@react-native-firebase/firestore';
 import * as Progress from 'react-native-progress';
 
-import {useUser} from '../../providers/UserProvider';
-import useTodos from '../../hooks/useTodos';
-// import {
-//   getListTasks,
-//   addTask,
-//   removeTask,
-//   editTask,
-// } from '../../components/services/ServicesStorage';
+import {useUserProvider} from '../../providers/UserProvider';
+import {useTodosProvider} from '../../providers/TodosProvider';
+import {actionTypes} from '../../reducers/TodosReducer';
+import {
+  getTodosFromLocalStorage,
+  removeTaskFromLocalStorage,
+} from '../../services/ServicesStorage';
+import syncData from '../../container/syncData';
+
 import Task from '../../components/Task/Task';
 import styles from './styles';
 
 const HomeScreen = ({navigation}) => {
-  const [{user}] = useUser();
-  const {todos, total, done} = useTodos('todos');
+  const [{user}] = useUserProvider();
+  const [{todos}, dispatch] = useTodosProvider();
 
-  const deleteById = (id) => {
-    firestore()
-      .collection('todos')
-      .doc(id)
-      .delete()
-      .then(() => {
-        console.log('The task was deleted.');
-      });
+  useEffect(() => {
+    syncData(user.uid);
+  }, [user.uid]);
+
+  useEffect(() => {
+    getTodosFromLocalStorage(user.uid).then((results) => {
+      dispatch({type: actionTypes.SET_TODOS, payload: results});
+    });
+  }, [dispatch, user.uid]);
+
+  const deleteTask = (task) => {
+    dispatch({type: actionTypes.DELETE_TASK, payload: task});
+    removeTaskFromLocalStorage(task);
+    syncData(user.uid);
   };
 
   const renderItem = ({item}) => (
-    <Task todo={item} navigation={navigation} deleteById={deleteById} />
+    <Task todo={item} navigation={navigation} deleteTask={deleteTask} />
   );
+
+  const calculateProgress = (todos) => {
+    const len = todos.length;
+    let count = 0;
+    if (len !== 0) {
+      for (let i = 0; i < len; i++) {
+        if (todos[i].isCompleted) {
+          count++;
+        }
+      }
+      return count / len;
+    }
+    return 0;
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.hiStyle}>What's up, {user.displayName}!</Text>
-      <View style={{alignItems: 'center', marginVertical: 16}}>
+      <View style={styles.progressWrap}>
         <Progress.Circle
-          progress={total === 0 ? 0 : done / total}
+          progress={calculateProgress(todos)}
           size={156}
           showsText={true}
           color="#3F2FFF"
@@ -68,63 +88,3 @@ const HomeScreen = ({navigation}) => {
   );
 };
 export default HomeScreen;
-
-//   const [listTasks,setListTasks] = useState([]);
-//   useEffect(()=>
-//   {
-//     getListTasks(email)
-//     .then(tasks =>
-//     {
-//       if(tasks.e) return;
-//       setListTasks(tasks);
-//     })
-//     .catch(error =>
-//     {
-//       console.error(error)
-//     })
-//   },[])
-
-//   const createTask = (email,nameTask,date_complete,category) =>
-//   {
-//     addTask(email,nameTask,date_complete,category)
-//             .then(tasks => {
-//                 setListTasks(tasks);
-//             })
-//     navigation.navigate("Home");
-//   }
-
-//   const deleteTask = (email,task) =>
-//   {
-//     removeTask(email,task)
-//     .then((tasks) =>
-//     {
-//       setListTasks(tasks);
-//     })
-//   }
-
-//   const edit = (email,id,newName,newCategory,newDate) =>
-//   {
-//     editTask(email,id,newName,newCategory,newDate)
-//     .then((tasks) =>
-//     {
-//       setListTasks(tasks);
-//     })
-//     navigation.navigate("Home");
-//   }
-
-//   return (
-//     <View style={styles.container}>
-//             <Text>Home</Text>
-//             <Text>Hello {user.displayName}</Text>
-//             <FlatList data={listTasks}
-//                       renderItem={({item}) =><Task task={item}
-//                                                     navigation={navigation}
-//                                                     removeTask={deleteTask}
-//                                                     editTask={edit}/>}
-//                       keyExtractor = {item =>`${item.id}`}
-//             />
-//             <TouchableOpacity style={styles.addButton} onPress={()=>{navigation.navigate("CreateTask",{createTask})}}>
-//                 <Image source={Add} style={{width:56,height:56}}/>
-//             </TouchableOpacity>
-//     </View>
-//   );

@@ -1,3 +1,4 @@
+// import {getUser} from "../components/services/UserStorage"
 export const initialState = {
   user: null,
 };

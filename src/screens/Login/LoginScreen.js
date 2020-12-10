@@ -1,11 +1,17 @@
 import React, {useEffect} from 'react';
 import {View, Text} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-community/google-signin';
 
-import {useUser} from '../../providers/UserProvider';
+import {useUserProvider} from '../../providers/UserProvider';
 import {actionTypes} from '../../reducers/UserReducer';
 import GoogleSignIn from '../../components/GoogleSignIn/GoogleSignIn';
+import {
+  getUserFromLocalStorage,
+  addUserToLocalStorage,
+} from '../../services/UserStorage';
+import {addNewTaskToLocalStorage} from '../../services/ServicesStorage';
 import styles from './styles';
 
 GoogleSignin.configure({
@@ -14,7 +20,14 @@ GoogleSignin.configure({
 });
 
 const LoginScreen = () => {
-  const [state, dispatch] = useUser();
+  const [state, dispatch] = useUserProvider();
+  const user = getUserFromLocalStorage();
+
+  useEffect(() => {
+    if (user) {
+      dispatch({type: actionTypes.SET_USER, payload: user});
+    }
+  }, [dispatch, user]);
 
   async function handleLogin() {
     // Get the users ID token
@@ -27,10 +40,24 @@ const LoginScreen = () => {
     auth()
       .signInWithCredential(googleCredential)
       .then((res) => {
+        addUserToLocalStorage(res.user);
         dispatch({type: actionTypes.SET_USER, payload: res.user});
+        firestore()
+          .collection('todos')
+          .orderBy('createAt', 'desc')
+          .onSnapshot((snap) => {
+            snap.forEach((doc) => {
+              if (doc.data().userId === res.user.uid) {
+                addNewTaskToLocalStorage({
+                  id: doc.id,
+                  ...doc.data(),
+                  createAt: doc.data().createAt.toDate(),
+                });
+              }
+            });
+          });
       });
   }
-
   return (
     <View style={styles.container}>
       <View style={styles.headingContainer}>

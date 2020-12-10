@@ -4,12 +4,12 @@ import {View, Text, TouchableOpacity} from 'react-native';
 import useCategory from '../../hooks/useCategory';
 import styles from './styles';
 
-const Category = ({category, color, navigation}) => {
-  const {todos, total, done} = useCategory(category);
+const Category = ({navigation, category, color}) => {
+  const {tasks, total, done} = useCategory(category);
   let progress = total === 0 ? 0 : Math.round((done / total) * 100);
 
   const goToDetailsScreen = () => {
-    navigation.navigate('CategoryDetails', {todos, category});
+    navigation.navigate('CategoryDetails', {tasks, category});
   };
 
   return (
