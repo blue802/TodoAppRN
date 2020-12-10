@@ -15,6 +15,14 @@ export const removeUserFromLocalStorage = () => {
   });
 };
 
+export const updateScoreFromLocalStorage = (userId, score) => {
+  return new Promise((resolve, reject) => {
+    realm.write(() => {
+      realm.create('User', {uid: userId, score}, 'modified');
+    });
+  });
+};
+
 export const getUserFromLocalStorage = () => {
   const user = realm.objects('User');
   if (user.length !== 0) {

@@ -2,11 +2,13 @@ import Realm from 'realm';
 
 const UserSchema = {
   name: 'User',
+  primaryKey: 'uid',
   properties: {
-    displayName: 'string',
-    email: 'string',
-    photoURL: 'string',
     uid: 'string',
+    email: 'string',
+    displayName: 'string',
+    photoURL: 'string',
+    score: 'int',
   },
 };
 const TaskSchema = {

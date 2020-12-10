@@ -4,10 +4,9 @@ import {SwipeRow} from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import syncData from '../../container/syncData';
-import {
-  updateTaskFromLocalStorage,
-  getTodosFromLocalStorage,
-} from '../../services/ServicesStorage';
+import syncAchievement from '../../container/syncAchievement';
+import {updateTaskFromLocalStorage} from '../../services/ServicesStorage';
+import {updateScoreFromLocalStorage} from '../../services/UserStorage';
 import {useTodosProvider} from '../../providers/TodosProvider';
 import {useUserProvider} from '../../providers/UserProvider';
 import {actionTypes} from '../../reducers/TodosReducer';
@@ -17,8 +16,8 @@ const Task = ({navigation, todo, deleteTask}) => {
   const [isCompleted, setIsCompleted] = useState(false);
   const closeRowRef = useRef(null);
   const deleteTimeoutRef = useRef(null);
-  const [state, dispatch] = useTodosProvider();
-  const [{user}] = useUserProvider();
+  const [state, dispatchTodos] = useTodosProvider();
+  const [{user}, dispatchUser] = useUserProvider();
 
   useEffect(() => {
     setIsCompleted(todo.isCompleted);
@@ -34,9 +33,12 @@ const Task = ({navigation, todo, deleteTask}) => {
       createAt: todo.createAt,
       userId: todo.userId,
     };
-    dispatch({type: actionTypes.UPDATE_TASK, payload: task});
+    dispatchTodos({type: actionTypes.UPDATE_TASK, payload: task});
     updateTaskFromLocalStorage(task);
+    dispatchUser({type: 'INCREASE_USER_SCORE'});
+    updateScoreFromLocalStorage(user.uid, user.score + 1);
     syncData(user.uid);
+    syncAchievement(user.uid);
   };
 
   const onSwipeValueChange = ({value}) => {
@@ -72,25 +74,24 @@ const Task = ({navigation, todo, deleteTask}) => {
           !todo.isCompleted && navigation.navigate('CreateTask', {todo})
         }>
         <View style={styles.rowFront}>
-          {isCompleted ? (
+          {todo.isCompleted ? (
             <Icon
               name="check-circle"
-              style={{...styles.icon, opacity: isCompleted ? 0.5 : 1}}
-              onPress={handleCompleteTask}
+              style={{...styles.icon, opacity: 0.5}}
               solid={true}
             />
           ) : (
             <Icon
               name="circle"
               onPress={handleCompleteTask}
-              style={{...styles.icon, opacity: isCompleted ? 0.5 : 1}}
+              style={{...styles.icon, opacity: 1}}
             />
           )}
           <Text
             style={{
               ...styles.title,
-              textDecorationLine: isCompleted ? 'line-through' : 'none',
-              opacity: isCompleted ? 0.5 : 1,
+              textDecorationLine: todo.isCompleted ? 'line-through' : 'none',
+              opacity: todo.isCompleted ? 0.5 : 1,
             }}>
             {todo.title}
           </Text>

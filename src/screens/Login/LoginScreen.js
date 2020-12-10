@@ -30,6 +30,20 @@ const LoginScreen = () => {
   }, [dispatch, user]);
 
   async function handleLogin() {
+    let user = null;
+
+    function setData(res, score) {
+      const user = {
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName,
+        photoURL: res.user.photoURL,
+        score: score,
+      };
+      addUserToLocalStorage(user);
+      dispatch({type: actionTypes.SET_USER, payload: user});
+    }
+
     // Get the users ID token
     const {idToken} = await GoogleSignin.signIn();
 
@@ -40,8 +54,21 @@ const LoginScreen = () => {
     auth()
       .signInWithCredential(googleCredential)
       .then((res) => {
-        addUserToLocalStorage(res.user);
-        dispatch({type: actionTypes.SET_USER, payload: res.user});
+        firestore()
+          .collection('achievements')
+          .doc(res.user.uid)
+          .get()
+          .then((doc) => {
+            if (doc.exists && doc.id === res.user.uid) {
+              setData(res, doc.data().score);
+            } else {
+              firestore().collection('achievements').doc(res.user.uid).set({
+                score: 0,
+              });
+              setData(res, 0);
+            }
+          });
+
         firestore()
           .collection('todos')
           .orderBy('createAt', 'desc')

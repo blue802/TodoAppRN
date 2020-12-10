@@ -47,7 +47,11 @@ const CreateTaskScreen = ({navigation, route}) => {
   };
 
   const toPrevious = () => {
-    navigation.navigate('Home');
+    if (route.params) {
+      navigation.navigate('Category');
+    } else {
+      navigation.navigate('Home');
+    }
   };
 
   const showMode = (currentMode) => {
@@ -132,7 +136,10 @@ const CreateTaskScreen = ({navigation, route}) => {
           <TouchableOpacity onPress={showTimepicker} style={styles.btn}>
             <Icon name="clock" style={styles.icon} />
             <Text style={styles.text}>
-              {date.getHours() + ':' + date.getMinutes()}
+              {date.getHours() +
+                ':' +
+                (date.getMinutes() < 10 ? '0' : '') +
+                date.getMinutes()}
             </Text>
           </TouchableOpacity>
         </View>
@@ -150,11 +157,15 @@ const CreateTaskScreen = ({navigation, route}) => {
       </View>
       <View style={styles.footer}>
         {route.params ? (
-          <TouchableOpacity style={styles.btnCreate} onPress={updateTask}>
+          <TouchableOpacity
+            style={styles.btnCreate}
+            onPress={() => updateTask()}>
             <Text style={{fontSize: 18, color: '#fff'}}>Save</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.btnCreate} onPress={createTask}>
+          <TouchableOpacity
+            style={styles.btnCreate}
+            onPress={() => createTask()}>
             <Text style={{fontSize: 18, color: '#fff'}}>New task</Text>
           </TouchableOpacity>
         )}

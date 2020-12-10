@@ -54,30 +54,3 @@ const CategoryDetailsScreen = ({route, navigation}) => {
 };
 
 export default CategoryDetailsScreen;
-
-// const deleteById = (userId,taskId) => {
-//   removeTask(userId,taskId)
-//   .then((tasks) =>{
-//     tasks = tasks.filter(t => t.category === category);
-//     setTask(tasks)
-//   });
-// };
-
-// const edit = (userId,newTask)=>{
-//     editTask(userId,newTask)
-//     .then((tasks) =>
-//           {
-//             tasks = tasks.filter(t => t.category === category);
-//             setTask(tasks);
-//             navigation.navigate("CategoryDetails");
-//           });
-// }
-
-// const toggle = (userId,taskId) => {
-//     toggleTask(userId,taskId)
-//     .then((tasks) =>
-//           {
-//             tasks = tasks.filter(t => t.category === category);
-//             setTask(tasks);
-//           });
-// }

@@ -14,7 +14,10 @@ const syncData = (userId) => {
           .get()
           .then((snapshot) => {
             snapshot.forEach((doc) => {
-              if (!todos.find((task) => task.id === doc.id)) {
+              if (
+                doc.data().userId === userId &&
+                !todos.find((task) => task.id === doc.id)
+              ) {
                 firestore().collection('todos').doc(doc.id).delete();
               }
             });

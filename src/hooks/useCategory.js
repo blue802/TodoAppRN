@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 
-import {getTodosFromLocalStorage} from '../services/ServicesStorage';
 import {useTodosProvider} from '../providers/TodosProvider';
 import {useUserProvider} from '../providers/UserProvider';
 const useCategory = (category) => {
