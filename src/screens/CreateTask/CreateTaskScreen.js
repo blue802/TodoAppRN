@@ -1,16 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Platform,
-  LogBox,
-} from 'react-native';
+import {View, Text, TextInput, Platform, LogBox} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Picker} from '@react-native-picker/picker';
 import shortid from 'shortid';
+import Ripple from 'react-native-material-ripple';
 
 import syncData from '../../container/syncData';
 import {useUserProvider} from '../../providers/UserProvider';
@@ -47,11 +41,7 @@ const CreateTaskScreen = ({navigation, route}) => {
   };
 
   const toPrevious = () => {
-    if (route.params) {
-      navigation.navigate('Category');
-    } else {
-      navigation.navigate('Home');
-    }
+    navigation.goBack();
   };
 
   const showMode = (currentMode) => {
@@ -81,7 +71,7 @@ const CreateTaskScreen = ({navigation, route}) => {
     addNewTaskToLocalStorage(task).then((msg) => {
       console.log(msg);
       syncData(user.uid);
-      navigation.navigate('Home');
+      navigation.goBack();
     });
   };
 
@@ -98,7 +88,7 @@ const CreateTaskScreen = ({navigation, route}) => {
     dispatch({type: actionTypes.UPDATE_TASK, payload: task});
     updateTaskFromLocalStorage(task).then((msg) => {
       console.log(msg);
-      navigation.navigate('Home');
+      navigation.goBack();
     });
     syncData(user.uid);
   };
@@ -106,9 +96,13 @@ const CreateTaskScreen = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.btnClose} onPress={toPrevious}>
+        <Ripple
+          rippleColor="violet"
+          rippleCentered={true}
+          style={styles.btnClose}
+          onPress={toPrevious}>
           <Icon name="times" style={styles.icon} />
-        </TouchableOpacity>
+        </Ripple>
       </View>
       <View style={styles.body}>
         <View style={styles.inputWrap}>
@@ -123,7 +117,12 @@ const CreateTaskScreen = ({navigation, route}) => {
           />
         </View>
         <View style={styles.btnWrap}>
-          <TouchableOpacity onPress={showDatepicker} style={styles.btn}>
+          <Ripple
+            rippleColor="violet"
+            rippleCentered={true}
+            rippleOpacity={1}
+            onPress={showDatepicker}
+            style={styles.btn}>
             <Icon name="calendar-alt" style={styles.icon} />
             <Text style={styles.text}>
               {date.getDate() +
@@ -132,8 +131,13 @@ const CreateTaskScreen = ({navigation, route}) => {
                 '-' +
                 date.getFullYear()}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={showTimepicker} style={styles.btn}>
+          </Ripple>
+          <Ripple
+            rippleColor="violet"
+            rippleCentered={true}
+            rippleOpacity={1}
+            onPress={showTimepicker}
+            style={styles.btn}>
             <Icon name="clock" style={styles.icon} />
             <Text style={styles.text}>
               {date.getHours() +
@@ -141,7 +145,7 @@ const CreateTaskScreen = ({navigation, route}) => {
                 (date.getMinutes() < 10 ? '0' : '') +
                 date.getMinutes()}
             </Text>
-          </TouchableOpacity>
+          </Ripple>
         </View>
 
         <View style={styles.pickerWrap}>
@@ -157,17 +161,21 @@ const CreateTaskScreen = ({navigation, route}) => {
       </View>
       <View style={styles.footer}>
         {route.params ? (
-          <TouchableOpacity
+          <Ripple
+            rippleColor="violet"
+            rippleOpacity={1}
             style={styles.btnCreate}
-            onPress={() => updateTask()}>
+            onPress={() => taskName && updateTask()}>
             <Text style={{fontSize: 18, color: '#fff'}}>Save</Text>
-          </TouchableOpacity>
+          </Ripple>
         ) : (
-          <TouchableOpacity
+          <Ripple
+            rippleColor="violet"
+            rippleOpacity={1}
             style={styles.btnCreate}
-            onPress={() => createTask()}>
+            onPress={() => taskName && createTask()}>
             <Text style={{fontSize: 18, color: '#fff'}}>New task</Text>
-          </TouchableOpacity>
+          </Ripple>
         )}
       </View>
       {showModal && (

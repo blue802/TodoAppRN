@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
-import {View, Text, TouchableOpacity, FlatList} from 'react-native';
+import {View, Text, FlatList} from 'react-native';
 import * as Progress from 'react-native-progress';
+import Ripple from 'react-native-material-ripple';
 
 import {useUserProvider} from '../../providers/UserProvider';
 import {useTodosProvider} from '../../providers/TodosProvider';
@@ -66,7 +67,7 @@ const HomeScreen = ({navigation}) => {
           strokeCap="round"
         />
       </View>
-      <Text style={styles.sectionTitle}>TODAY'S TASKS</Text>
+      <Text style={styles.sectionTitle}>YOUR MISSIONS</Text>
       {todos.length > 0 ? (
         <FlatList
           data={todos}
@@ -76,14 +77,16 @@ const HomeScreen = ({navigation}) => {
       ) : (
         <Text style={styles.message}>Nothing!</Text>
       )}
-      <TouchableOpacity
+      <Ripple
         style={styles.btnCreate}
+        rippleColor="violet"
+        rippleOpacity={1}
+        rippleCentered={true}
         onPress={() => {
           navigation.navigate('CreateTask');
-        }}
-        activeOpacity={0.8}>
+        }}>
         <Text style={styles.plusIcon}>+</Text>
-      </TouchableOpacity>
+      </Ripple>
     </View>
   );
 };

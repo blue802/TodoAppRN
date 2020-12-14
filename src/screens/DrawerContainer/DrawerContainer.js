@@ -1,7 +1,8 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import PropTypes from 'prop-types';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {GoogleSignin} from '@react-native-community/google-signin';
 
 import {removeUserFromLocalStorage} from '../../services/UserStorage';
@@ -14,9 +15,16 @@ import styles from './styles';
 const DrawerContainer = ({navigation}) => {
   const [{user}, dispatch] = useUserProvider();
 
+  function toClose() {
+    navigation.closeDrawer();
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        <TouchableOpacity style={styles.btnClose} onPress={toClose}>
+          <Icon name="angle-left" style={styles.icon} />
+        </TouchableOpacity>
         <View>
           <Avatar avatarUrl={user.photoURL} />
           <Text style={styles.username}>{user.displayName}</Text>
